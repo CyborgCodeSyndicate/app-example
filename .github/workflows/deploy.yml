@@ -1,0 +1,58 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Application
+    runs-on: ubuntu-latest
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: app-example
+      STAGING_HOST: your-staging-host.com
+      DEPLOY_DIR: /opt/staging/app-example
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      - name: Run Unit Tests
+        run: mvn test
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ github.repository }}:latest .
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ github.repository }}:latest
+
+      # Simulated deploy step (can be rsync, ssh, helm, kubectl, etc.)
+      - name: Deploy to Staging (Simulated)
+        run: |
+          echo "Deploying to $STAGING_HOST:$DEPLOY_DIR"
+          echo "This is a simulated deploy step"
+          # You could add ssh commands here if real
+
+      - name: Confirm Deployment Complete
+        run: echo "Deployment completed successfully."
