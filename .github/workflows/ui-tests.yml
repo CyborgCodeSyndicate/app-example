@@ -17,7 +17,4 @@ jobs:
       maxThreadsPerJob: "10"
       maxThreadsPerSeleniumContainer: "5"
       sizePerSeleniumContainer: "2g"
-      setupMavenModule: "ui-zerobank-project"
-      pluginModule: "test-allocator-maven-plugin"
-      allureResultsPath: "ui-zerobank-project/allure-results"
     secrets: inherit
