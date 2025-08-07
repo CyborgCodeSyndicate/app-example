@@ -1,58 +1,69 @@
-name: Deploy to Staging
+name: Deploy to Staging (Simulated)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type (for future use)'
+        required: false
+        default: none
+        type: choice
+        options: [major, minor, patch, none]
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: 17
+  APP_NAME: app-example
 
 jobs:
-  build-and-deploy:
-    name: Build & Deploy Application
+  deploy:
+    name: Simulate Deployment
     runs-on: ubuntu-latest
-
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: app-example
-      STAGING_HOST: your-staging-host.com
-      DEPLOY_DIR: /opt/staging/app-example
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Set Up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
 
-      - name: Build with Maven
+      - name: Build the App
         run: mvn clean install -DskipTests
 
       - name: Run Unit Tests
         run: mvn test
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Docker Image
+      - name: Simulate Docker Build
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ github.repository }}:latest .
+          echo "🔧 Simulating docker build for $APP_NAME"
+          echo "docker build -t fake-registry/$APP_NAME:dev ."
 
-      - name: Push Docker Image
+      - name: Simulate Docker Push
         run: |
-          docker push ${{ env.REGISTRY }}/${{ github.repository }}:latest
+          echo "🚀 Simulating docker push"
+          echo "docker push fake-registry/$APP_NAME:dev"
 
-      # Simulated deploy step (can be rsync, ssh, helm, kubectl, etc.)
-      - name: Deploy to Staging (Simulated)
+      - name: Simulate Deployment Step
         run: |
-          echo "Deploying to $STAGING_HOST:$DEPLOY_DIR"
-          echo "This is a simulated deploy step"
-          # You could add ssh commands here if real
+          echo "📦 Pretending to deploy $APP_NAME to staging server"
+          echo "✅ All good. No real containers were harmed."
 
-      - name: Confirm Deployment Complete
-        run: echo "Deployment completed successfully."
+      - name: Deployment Summary
+        run: |
+          echo "### 🚀 Simulated Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | 🔧 Simulated |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Push | 🔧 Simulated |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment | ✅ Simulated OK |" >> $GITHUB_STEP_SUMMARY
