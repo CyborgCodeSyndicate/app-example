@@ -1,0 +1,23 @@
+name: Trigger UI Tests from Test Repo
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Staging (Simulated)"]
+    types:
+      - completed
+
+jobs:
+  trigger-ui-tests:
+    name: Run UI Tests from temp-project
+    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
+    with:
+      tagsInclude: "Regression"
+      tagsExclude: "Flaky"
+      maxTestsPerJob: "20"
+      maxThreadsPerJob: "10"
+      maxThreadsPerSeleniumContainer: "5"
+      sizePerSeleniumContainer: "2g"
+      setupMavenModule: "ui-zerobank-project"
+      pluginModule: "test-allocator-maven-plugin"
+      allureResultsPath: "ui-zerobank-project/allure-results"
+    secrets: inherit
