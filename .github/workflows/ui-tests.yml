@@ -9,7 +9,7 @@ on:
 jobs:
   trigger-ui-tests:
     name: Run UI Tests from temp-project
-    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
+    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-run-job
     with:
       tagsInclude: "Regression"
       tagsExclude: "Flaky"
