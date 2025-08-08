@@ -6,6 +6,9 @@ on:
     types:
       - completed
 
+permissions:
+  contents: write
+
 jobs:
   trigger-ui-tests:
     name: Run UI Tests from temp-project
