@@ -20,4 +20,5 @@ jobs:
       maxThreadsPerJob: "10"
       maxThreadsPerSeleniumContainer: "5"
       sizePerSeleniumContainer: "2g"
+      testRepoRef: "test-app-run-job"
     secrets: inherit
