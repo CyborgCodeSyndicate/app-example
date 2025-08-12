@@ -1,0 +1,39 @@
+name: Detect Microservice Test Tags
+
+description: Detects which tags should be run based on changed paths
+
+inputs:
+  before:
+    description: Git SHA before the change
+    required: true
+  after:
+    description: Git SHA after the change
+    required: true
+  service_tag_map:
+    description: Newline-delimited path -> tag mappings
+    required: true
+
+outputs:
+  tags:
+    description: Comma-separated tags to include
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        CHANGED=$(git diff --name-only "${{ inputs.before }}" "${{ inputs.after }}")
+        TAGS=""
+
+        while read -r line; do
+          path=$(echo "$line" | cut -d'>' -f1 | xargs)
+          tag=$(echo "$line" | cut -d'>' -f2 | xargs)
+
+          if echo "$CHANGED" | grep -q "^$path"; then
+            TAGS="$TAGS,$tag"
+          fi
+        done <<< "${{ inputs.service_tag_map }}"
+
+        TAGS=$(echo "$TAGS" | sed 's/^,//')
+        echo "Detected tags: $TAGS"
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+      shell: bash
