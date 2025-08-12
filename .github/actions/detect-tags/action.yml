@@ -41,8 +41,9 @@ runs:
         TAGS=""
         while read -r line; do
           [ -z "$line" ] && continue
-          path=$(echo "$line" | cut -d'>' -f1 | xargs)
-          tag=$(echo "$line" | cut -d'>' -f2 | xargs)
+          IFS='>' read -r path tag <<< "$line"
+          path=$(echo "$path" | xargs)
+          tag=$(echo "$tag" | xargs)
 
           echo "🔍 Matching path: $path - against changed files:"
           echo "$CHANGED" | while read changed; do
