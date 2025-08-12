@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"960de71b6f90dcc15dec149cd097b922","name":"Element State & Visibility Issues","statistic":{"failed":0,"broken":3,"skipped":0,"passed":0,"unknown":0,"total":3}},{"uid":"fa64ba49d9c0a7cec4dea46b8725c1f0","name":"WebDriver & Session Issues","statistic":{"failed":0,"broken":1,"skipped":0,"passed":0,"unknown":0,"total":1}}]}
