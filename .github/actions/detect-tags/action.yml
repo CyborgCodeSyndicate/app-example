@@ -40,7 +40,7 @@ runs:
 
         TAGS=""
         while read -r line; do
-          path=$(echo "$line" | cut -d'>' -f1 | xargs)
+          path=$(echo "$line" | cut -d'>' -f1 | xargs | sed 's:/*$::')
           tag=$(echo "$line" | cut -d'>' -f2 | xargs)
           if echo "$CHANGED" | grep -q "^$path"; then
             TAGS="$TAGS,$tag"
