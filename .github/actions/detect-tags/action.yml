@@ -21,7 +21,15 @@ runs:
   using: "composite"
   steps:
     - run: |
-        CHANGED=$(git diff --name-only "${{ inputs.before }}" "${{ inputs.after }}")
+        BEFORE=${{ inputs.before }}
+        AFTER=${{ inputs.after }}
+
+        if [ -z "$BEFORE" ]; then
+          echo "🔍 'before' SHA is empty. Using HEAD^ as fallback."
+          BEFORE=$(git rev-parse "$AFTER^")
+        fi
+
+        CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
         TAGS=""
 
         while read -r line; do
