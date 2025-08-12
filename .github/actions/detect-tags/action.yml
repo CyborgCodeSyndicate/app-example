@@ -42,9 +42,9 @@ runs:
         echo "${{ inputs.service_tag_map }}" | cat -A
 
         TAGS=""
-        while read -r line; do
+        echo "${{ inputs.service_tag_map }}" | tr -d '\r' | while IFS= read -r line; do
           [ -z "$line" ] && continue
-          line=$(echo "$line" | tr -d '\r')
+          echo "🐛 Raw line: [$line]"
 
           IFS='>' read -r path tag <<< "$line"
           path=$(echo "$path" | xargs)
@@ -60,7 +60,7 @@ runs:
               echo "   ❌ No match for this file"
             fi
           done
-        done <<< "${{ inputs.service_tag_map }}"
+        done
 
         TAGS=$(echo "$TAGS" | sed 's/^,//')
         echo "✅ Detected tags: $TAGS"
