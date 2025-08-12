@@ -39,6 +39,8 @@ runs:
         echo "$CHANGED"
 
         TAGS=""
+        echo "📦 Raw service_tag_map content:"
+        echo "${{ inputs.service_tag_map }}" | cat -A
         while read -r line; do
           [ -z "$line" ] && continue
           IFS='>' read -r path tag <<< "$line"
