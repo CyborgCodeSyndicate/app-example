@@ -20,7 +20,7 @@ jobs:
 
       - name: Detect tags to run
         id: detect
-        uses: CyborgCodeSyndicate/actions/.github/actions/detect-tags@v1
+        uses: ./.github/actions/detect-tags  # LOCAL ACTION REFERENCE
         with:
           before: ${{ github.event.workflow_run.head_commit.before }}
           after: ${{ github.event.workflow_run.head_commit.id }}
