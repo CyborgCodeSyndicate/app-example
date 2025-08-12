@@ -40,11 +40,18 @@ runs:
 
         TAGS=""
         while read -r line; do
-          path=$(echo "$line" | cut -d'>' -f1 | xargs | sed 's:/*$::')
+          path=$(echo "$line" | cut -d'>' -f1 | xargs)
           tag=$(echo "$line" | cut -d'>' -f2 | xargs)
-          if echo "$CHANGED" | grep -q "^$path"; then
-            TAGS="$TAGS,$tag"
-          fi
+          echo "🔍 Matching path: $path against changed files:"
+          echo "$CHANGED" | while read changed; do
+            echo "   🔸 Changed: $changed"
+            if echo "$CHANGED" | grep -q "^$path"; then
+              echo "   ✅ Match found! Adding tag: $tag"
+              TAGS="$TAGS,$tag"
+            else
+              echo "   ❌ No match for this file"
+            fi
+          done
         done <<< "${{ inputs.service_tag_map }}"
 
         TAGS=$(echo "$TAGS" | sed 's/^,//')
