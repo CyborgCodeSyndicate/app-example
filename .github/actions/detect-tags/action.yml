@@ -53,7 +53,7 @@ runs:
           echo "🔍 Matching path: $path - tag: $tag - against changed files:"
           echo "$CHANGED" | while read changed; do
             echo "   🔸 Changed: $changed"
-            if echo "$changed" | grep -q "^$path"; then
+            if [[ "$changed" == "$path"* ]]; then
               echo "   ✅ Match found! Adding tag: $tag"
               TAGS="$TAGS,$tag"
             else
