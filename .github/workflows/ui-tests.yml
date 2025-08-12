@@ -16,8 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           ref: ${{ github.event.workflow_run.head_commit.id }}
+          fetch-depth: 2
+          
+      - name: Debug Git history
+        run: git log --oneline --graph -n 5
 
       - name: Detect tags to run
         id: detect
