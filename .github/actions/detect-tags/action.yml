@@ -20,28 +20,33 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - run: |
-        BEFORE=${{ inputs.before }}
-        AFTER=${{ inputs.after }}
+    - shell: bash
+      run: |
+        BEFORE="${{ inputs.before }}"
+        AFTER="${{ inputs.after }}"
 
         if [ -z "$BEFORE" ]; then
           echo "🔍 'before' SHA is empty. Using HEAD^ as fallback."
-          BEFORE=$(git rev-parse "$AFTER^")
+          BEFORE=$(git rev-parse "${AFTER}^")
+          echo "✅ Fallback BEFORE=$BEFORE"
         fi
 
-        CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
-        TAGS=""
+        echo "🔧 Using BEFORE=$BEFORE"
+        echo "🔧 Using AFTER=$AFTER"
 
+        CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
+        echo "🔄 Changed files:"
+        echo "$CHANGED"
+
+        TAGS=""
         while read -r line; do
           path=$(echo "$line" | cut -d'>' -f1 | xargs)
           tag=$(echo "$line" | cut -d'>' -f2 | xargs)
-
           if echo "$CHANGED" | grep -q "^$path"; then
             TAGS="$TAGS,$tag"
           fi
         done <<< "${{ inputs.service_tag_map }}"
 
         TAGS=$(echo "$TAGS" | sed 's/^,//')
-        echo "Detected tags: $TAGS"
+        echo "✅ Detected tags: $TAGS"
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
-      shell: bash

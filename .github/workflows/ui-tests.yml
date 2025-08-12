@@ -18,7 +18,7 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_commit.id }}
           fetch-depth: 2
-          
+
       - name: Debug Git history
         run: git log --oneline --graph -n 5
 
@@ -36,7 +36,7 @@ jobs:
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
-      tagsInclude: ${{ needs.detect-tags.outputs.tags || 'Regression' }}
+      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
       tagsExclude: "Flaky"
       maxTestsPerJob: "20"
       maxThreadsPerJob: "10"
