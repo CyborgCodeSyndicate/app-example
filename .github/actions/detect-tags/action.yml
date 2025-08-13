@@ -40,14 +40,10 @@ runs:
         echo "🔄 Changed files:"
         echo "$CHANGED"
 
-        echo "📦 Raw service_tag_map content:"
-        echo "${{ inputs.service_tag_map }}" | cat -A
-
         TAGS=""
         IFS=$'\n' read -r -d '' -a MAP < <(echo "${{ inputs.service_tag_map }}" | tr -d '\r' && printf '\0')
         for line in "${MAP[@]}"; do
           [ -z "$line" ] && continue
-          echo "🐛 Raw line: [$line]"
 
           path=$(echo "$line" | awk -F'->' '{print $1}' | xargs)
           tag=$(echo "$line" | awk -F'->' '{print $2}' | xargs)

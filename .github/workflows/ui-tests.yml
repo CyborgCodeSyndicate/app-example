@@ -19,9 +19,6 @@ jobs:
           ref: ${{ github.event.workflow_run.head_commit.id }}
           fetch-depth: 2
 
-      - name: Debug Git history
-        run: git log --oneline --graph -n 5
-
       - name: Detect tags to run
         id: detect
         uses: ./.github/actions/detect-tags  # LOCAL ACTION REFERENCE
@@ -31,13 +28,7 @@ jobs:
           service_tag_map: |
             src/main/java/account/->account-service
             src/main/java/payment/->payment-service
-  debug-tags:
-    name: 🐛 Debug tag output
-    runs-on: ubuntu-latest
-    needs: detect-tags
-    steps:
-      - name: 🔍 Print detected tags
-        run: echo "✅ Detected tags = '${{ needs.detect-tags.outputs.tags }}'"
+
   trigger-ui-tests:
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
