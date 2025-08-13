@@ -38,15 +38,15 @@ jobs:
     steps:
       - name: 🔍 Print detected tags
         run: echo "✅ Detected tags = '${{ needs.detect-tags.outputs.tags }}'"
-#  trigger-ui-tests:
-#    needs: detect-tags
-#    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
-#    with:
-#      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
-#      tagsExclude: "Flaky"
-#      maxTestsPerJob: "20"
-#      maxThreadsPerJob: "10"
-#      maxThreadsPerSeleniumContainer: "5"
-#      sizePerSeleniumContainer: "2g"
-#      testRepoRef: "test-app-job"
-#    secrets: inherit
+  trigger-ui-tests:
+    needs: detect-tags
+    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
+    with:
+      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
+      tagsExclude: "Flaky"
+      maxTestsPerJob: "20"
+      maxThreadsPerJob: "10"
+      maxThreadsPerSeleniumContainer: "5"
+      sizePerSeleniumContainer: "2g"
+      testRepoRef: "test-app-job"
+    secrets: inherit
