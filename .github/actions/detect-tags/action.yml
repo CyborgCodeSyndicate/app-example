@@ -16,11 +16,12 @@ inputs:
 outputs:
   tags:
     description: Comma-separated tags to include
+    value: ${{ steps.set-tag-output.outputs.tags }}
 
 runs:
   using: "composite"
   steps:
-    - id: detect
+    - id: set-tag-output
       shell: bash
       run: |
         BEFORE="${{ inputs.before }}"
