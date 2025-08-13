@@ -10,7 +10,7 @@ inputs:
     description: Git SHA after the change
     required: true
   service_tag_map:
-    description: Newline-delimited path -> tag mappings
+    description: Newline-delimited path->tag mappings
     required: true
 
 outputs:
@@ -46,16 +46,13 @@ runs:
           [ -z "$line" ] && continue
           echo "🐛 Raw line: [$line]"
 
-          IFS='>' read -r path tag <<< "$line"
-          path=$(echo "$path" | xargs)
-          tag=$(echo "$tag" | xargs)
+          path=$(echo "$line" | awk -F'->' '{print $1}' | xargs)
+          tag=$(echo "$line" | awk -F'->' '{print $2}' | xargs)
 
           echo "🔍 Matching path: $path - tag: $tag - against changed files:"
           echo "$CHANGED" | while read changed; do
             echo "   🔸 Changed: [$changed]"
             echo "   🔸 Path:    [$path]"
-            echo "$changed" | od -c
-            echo "$path" | od -c
             if [[ "$changed" == "$path"* ]]; then
               echo "   ✅ Match found! Adding tag: $tag"
               TAGS="$TAGS,$tag"

@@ -29,8 +29,8 @@ jobs:
           before: ${{ github.event.workflow_run.head_commit.before }}
           after: ${{ github.event.workflow_run.head_commit.id }}
           service_tag_map: |
-            src/main/java/account/ -> account-service
-            src/main/java/payment/ -> payment-service
+            src/main/java/account/->account-service
+            src/main/java/payment/->payment-service
 #  trigger-ui-tests:
 #    needs: detect-tags
 #    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
