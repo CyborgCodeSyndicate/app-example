@@ -42,7 +42,8 @@ runs:
         echo "${{ inputs.service_tag_map }}" | cat -A
 
         TAGS=""
-        echo "${{ inputs.service_tag_map }}" | tr -d '\r' | while IFS= read -r line; do
+        IFS=$'\n' read -r -d '' -a MAP < <(echo "${{ inputs.service_tag_map }}" | tr -d '\r' && printf '\0')
+        for line in "${MAP[@]}"; do
           [ -z "$line" ] && continue
           echo "🐛 Raw line: [$line]"
 
@@ -50,7 +51,7 @@ runs:
           tag=$(echo "$line" | awk -F'->' '{print $2}' | xargs)
 
           echo "🔍 Matching path: $path - tag: $tag - against changed files:"
-          echo "$CHANGED" | while read changed; do
+          while read -r changed; do
             echo "   🔸 Changed: [$changed]"
             echo "   🔸 Path:    [$path]"
             if [[ "$changed" == "$path"* ]]; then
@@ -59,7 +60,7 @@ runs:
             else
               echo "   ❌ No match!"
             fi
-          done
+          done <<< "$CHANGED"
         done
 
         TAGS=$(echo "$TAGS" | sed 's/^,//')
