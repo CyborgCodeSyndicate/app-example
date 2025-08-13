@@ -66,3 +66,7 @@ runs:
         TAGS=$(echo "$TAGS" | sed 's/^,//')
         echo "✅ Detected tags: $TAGS"
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
+        
+    - name: ✅ Print tags to be passed
+      run: echo "tags detected = '${{ steps.detect.outputs.tags }}'"
+      shell: bash

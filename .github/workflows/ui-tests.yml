@@ -31,15 +31,22 @@ jobs:
           service_tag_map: |
             src/main/java/account/->account-service
             src/main/java/payment/->payment-service
-  trigger-ui-tests:
+  debug-tags:
+    name: 🐛 Debug tag output
+    runs-on: ubuntu-latest
     needs: detect-tags
-    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
-    with:
-      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
-      tagsExclude: "Flaky"
-      maxTestsPerJob: "20"
-      maxThreadsPerJob: "10"
-      maxThreadsPerSeleniumContainer: "5"
-      sizePerSeleniumContainer: "2g"
-      testRepoRef: "test-app-job"
-    secrets: inherit
+    steps:
+      - name: 🔍 Print detected tags
+        run: echo "✅ Detected tags = '${{ needs.detect-tags.outputs.tags }}'"
+#  trigger-ui-tests:
+#    needs: detect-tags
+#    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
+#    with:
+#      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
+#      tagsExclude: "Flaky"
+#      maxTestsPerJob: "20"
+#      maxThreadsPerJob: "10"
+#      maxThreadsPerSeleniumContainer: "5"
+#      sizePerSeleniumContainer: "2g"
+#      testRepoRef: "test-app-job"
+#    secrets: inherit
