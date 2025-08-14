@@ -33,7 +33,7 @@ jobs:
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
-      tagsInclude: "Smoke", ${{ needs.detect-tags.outputs.tags }}
+      tagsInclude: "Smoke, ${{ needs.detect-tags.outputs.tags }}"
       tagsExclude: "Flaky"
       maxTestsPerJob: "20"
       maxThreadsPerJob: "10"
