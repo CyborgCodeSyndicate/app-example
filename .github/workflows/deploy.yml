@@ -2,7 +2,7 @@ name: Deploy to Staging (Simulated)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
   workflow_dispatch:
     inputs:
