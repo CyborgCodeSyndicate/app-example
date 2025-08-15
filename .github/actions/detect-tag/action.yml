@@ -1,6 +1,6 @@
-name: Detect Microservice Test Tags
+name: Detect Microservice Codebase Changes
 
-description: Detects which tags should be run based on changed paths
+description: Emits a test tag when codebase changes are detected
 
 inputs:
   before:
@@ -14,9 +14,9 @@ inputs:
     required: true
 
 outputs:
-  tags:
-    description: Comma-separated tags to include
-    value: ${{ steps.set.outputs.tags }}
+  tag:
+    description: Tag to include
+    value: ${{ steps.set.outputs.tag }}
 
 runs:
   using: "composite"

@@ -1,4 +1,4 @@
-name: Trigger UI Tests from temp-project
+name: Trigger UI Tests
 
 on:
   workflow_run:
@@ -9,30 +9,30 @@ permissions:
   contents: write
 
 jobs:
-  detect-tags:
+  detect-tag:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.detect.outputs.tags }}
+      tag: ${{ steps.detect.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_commit.id }}
           fetch-depth: 2
 
-      - name: Detect tag for src/** changes
+      - name: Set tag for detected changes
         id: detect
-        uses: ./.github/actions/detect-tags  # LOCAL ACTION REFERENCE
+        uses: ./.github/actions/detect-tag  # LOCAL ACTION REFERENCE
         with:
           before: ${{ github.event.workflow_run.head_commit.before }}
           after: ${{ github.event.workflow_run.head_commit.id }}
           service_tag: account-service
 
   trigger-ui-tests:
-    if: ${{ needs.detect-tags.outputs.tags != '' }}
-    needs: detect-tags
+    if: ${{ needs.detect-tag.outputs.tag != '' }}
+    needs: detect-tag
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
-      tagsInclude: "Smoke, ${{ needs.detect-tags.outputs.tags }}"
+      tagsInclude: "Smoke, ${{ needs.detect-tag.outputs.tag }}"
       tagsExclude: "Flaky"
       maxTestsPerJob: "20"
       maxThreadsPerJob: "10"
