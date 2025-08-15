@@ -41,12 +41,12 @@ runs:
         echo "Changed files:"
         echo "$CHANGED"
 
-        TAGS=""
+        TAG=""
         if echo "$CHANGED" | grep -qE '^src/'; then
-          TAGS="${{ inputs.service_tag }}"
-          echo "✅ Emit tag: $TAGS"
+          TAG="${{ inputs.service_tag }}"
+          echo "✅ Emit tag: $TAG"
         else
           echo "❌ No codebase changes under 'src/' — skipping tag emission"
         fi
         
-        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
