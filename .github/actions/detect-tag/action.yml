@@ -44,9 +44,9 @@ runs:
         TAGS=""
         if echo "$CHANGED" | grep -qE '^src/'; then
           TAGS="${{ inputs.service_tag }}"
+          echo "✅ Emit tag: $TAGS"
         else
           echo "❌ No codebase changes under 'src/' — skipping tag emission"
         fi
         
-        echo "✅ Emit tag: $TAGS"
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
