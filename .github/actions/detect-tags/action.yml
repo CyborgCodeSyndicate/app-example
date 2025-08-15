@@ -9,58 +9,42 @@ inputs:
   after:
     description: Git SHA after the change
     required: true
-  service_tag_map:
-    description: Newline-delimited path->tag mappings
+  service_tag:
+    description: Tag to emit when a change is detected
     required: true
 
 outputs:
   tags:
     description: Comma-separated tags to include
-    value: ${{ steps.set-tag-output.outputs.tags }}
+    value: ${{ steps.set.outputs.tags }}
 
 runs:
   using: "composite"
   steps:
-    - id: set-tag-output
+    - id: set
       shell: bash
       run: |
+        set -euo pipefail
+
         BEFORE="${{ inputs.before }}"
         AFTER="${{ inputs.after }}"
 
+        # Fallback when 'before' is empty (common with workflow_run)
         if [ -z "$BEFORE" ]; then
-          echo "🔍 'before' SHA is empty. Using HEAD^ as fallback."
+          echo "ℹ️ 'before' SHA empty; using parent of AFTER"
           BEFORE=$(git rev-parse "${AFTER}^")
-          echo "✅ Fallback BEFORE=$BEFORE"
         fi
 
-        echo "🔧 Using BEFORE=$BEFORE"
-        echo "🔧 Using AFTER=$AFTER"
+        echo "Diff range: $BEFORE..$AFTER"
 
-        CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
-        echo "🔄 Changed files:"
+        CHANGED=$(git diff --name-only --diff-filter=ACMRD "$BEFORE" "$AFTER" -- || true)
+        echo "Changed files:"
         echo "$CHANGED"
 
         TAGS=""
-        IFS=$'\n' read -r -d '' -a MAP < <(echo "${{ inputs.service_tag_map }}" | tr -d '\r' && printf '\0')
-        for line in "${MAP[@]}"; do
-          [ -z "$line" ] && continue
-
-          path=$(echo "$line" | awk -F'->' '{print $1}' | xargs)
-          tag=$(echo "$line" | awk -F'->' '{print $2}' | xargs)
-
-          echo "🔍 Matching path: $path - tag: $tag - against changed files:"
-          while read -r changed; do
-            echo "   🔸 Changed: [$changed]"
-            echo "   🔸 Path:    [$path]"
-            if [[ "$changed" == "$path"* ]]; then
-              echo "   ✅ Match found! Adding tag: $tag"
-              TAGS="$TAGS,$tag"
-            else
-              echo "   ❌ No match!"
-            fi
-          done <<< "$CHANGED"
-        done
-
-        TAGS=$(echo "$TAGS" | sed 's/^,//')
+        if echo "$CHANGED" | grep -qE '^src/'; then
+          TAGS="${{ inputs.service_tag }}"
+        fi
+        
         echo "✅ Detected tags: $TAGS"
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
