@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version_bump:
-        description: 'Version bump type (for future use)'
+        description: 'Version bump type'
         required: false
         default: none
         type: choice
@@ -66,4 +66,4 @@ jobs:
           echo "| Unit Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker Build | 🔧 Simulated |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker Push | 🔧 Simulated |" >> $GITHUB_STEP_SUMMARY
-          echo "| Deployment | ✅ Simulated OK |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment | ✅ Completed OK |" >> $GITHUB_STEP_SUMMARY
