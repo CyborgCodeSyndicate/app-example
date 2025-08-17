@@ -30,9 +30,9 @@ jobs:
   trigger-ui-tests:
     if: ${{ needs.detect-tag.outputs.tag != '' }}
     needs: detect-tag
-    uses: CyborgCodeSyndicate/temp-project/.github/workflows/dispatch-tests.yml@test-app-job
+    uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
-      tagsInclude: "Regression, ${{ needs.detect-tag.outputs.tag }}"
+      tagsInclude: "Smoke, ${{ needs.detect-tag.outputs.tag }}"
       tagsExclude: "Flaky"
       maxTestsPerJob: "20"
       maxThreadsPerJob: "10"
