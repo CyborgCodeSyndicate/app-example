@@ -1,0 +1,4 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Mon Aug 18 11:25:07 UTC 2025","Mon Aug 18 11:25:17 UTC 2025","10245","","com.zerobank.project.ZeroBank2Test","","com.zerobank.project.ZeroBank2Test","radioButtonTest","radioButtonTest(Quest)","COMPONENTS: Button, Input, Link, List, Select, Radio, Alert"
+"passed","Mon Aug 18 11:25:03 UTC 2025","Mon Aug 18 11:25:10 UTC 2025","6728","","com.zerobank.project.ZeroBank7Test","","com.zerobank.project.ZeroBank7Test","alertTest","alertTest(Quest)","COMPONENTS: Button, Input, Link, Select, Alert"
+"passed","Mon Aug 18 11:25:07 UTC 2025","Mon Aug 18 11:25:17 UTC 2025","9636","","com.zerobank.project.ZeroBank2Test","","com.zerobank.project.ZeroBank2Test","alertTest","alertTest(Quest)","COMPONENTS: Button, Input, Link, Select, Alert"
