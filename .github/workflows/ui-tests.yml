@@ -9,30 +9,32 @@ permissions:
   contents: write
 
 jobs:
-  detect-tag:
+  detect-tags:
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.detect.outputs.tag }}
+      tags: ${{ steps.detect.outputs.tags }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_commit.id }}
           fetch-depth: 2
 
-      - name: Set tag for detected changes
+      - name: Set tags for detected changes
         id: detect
-        uses: ./.github/actions/detect-tag  # LOCAL ACTION REFERENCE
+        uses: ./.github/actions/detect-tags  # LOCAL ACTION REFERENCE
         with:
           before: ${{ github.event.workflow_run.head_commit.before }}
           after: ${{ github.event.workflow_run.head_commit.id }}
-          service_tag: account-service
+          service_tag_map: |
+            src/main/java/account/->account-service
+            src/main/java/payment/->payment-service
 
   trigger-ui-tests:
     if: ${{ needs.detect-tag.outputs.tag != '' }}
-    needs: detect-tag
+    needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
-      tagsInclude: "Smoke, ${{ needs.detect-tag.outputs.tag }}"
+      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
       tagsExclude: "Flaky"
       maxTestsPerJob: "20"
       maxThreadsPerJob: "10"
