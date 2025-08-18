@@ -9,58 +9,71 @@ inputs:
   after:
     description: Git SHA after the change
     required: true
-  service_tag_map:
-    description: Tags to emit when a change is detected
+  filters:
+    description: YAML mapping or path to a filters file (keys = tags)
     required: true
 
 outputs:
   tags:
     description: Comma-separated tags to include
-    value: ${{ steps.set-tag-output.outputs.tags }}
+    value: ${{ steps.set.outputs.tags }}
+  matched:
+    description: "true if at least one filter matched, else false"
+    value: ${{ steps.set.outputs.matched }}
 
 runs:
   using: "composite"
   steps:
-    - id: set-tag-output
+    - name: Compute base (handles empty 'before' & first-commit case)
+      id: base
       shell: bash
       run: |
-        BEFORE="${{ inputs.before }}"
-        AFTER="${{ inputs.after }}"
+        set -euo pipefail
+        BEFORE='${{ inputs.before }}'
+        AFTER='${{ inputs.after }}'
 
         if [ -z "$BEFORE" ]; then
-          echo "🔍 'before' SHA is empty. Using HEAD^ as fallback."
-          BEFORE=$(git rev-parse "${AFTER}^")
-          echo "✅ Fallback BEFORE=$BEFORE"
+          if git rev-parse "${AFTER}^" >/dev/null 2>&1; then
+            BEFORE=$(git rev-parse "${AFTER}^")
+            echo "ℹ️ 'before' empty → using parent of AFTER: $BEFORE"
+          else
+            BEFORE=$(git hash-object -t tree /dev/null)  # empty tree for first commit
+            echo "ℹ️ No parent for AFTER → using empty tree: $BEFORE"
+          fi
         fi
 
-        echo "🔧 Using BEFORE=$BEFORE"
-        echo "🔧 Using AFTER=$AFTER"
+        echo "base=$BEFORE" >> "$GITHUB_OUTPUT"
+        echo "after=$AFTER" >> "$GITHUB_OUTPUT"
 
-        CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
-        echo "🔄 Changed files:"
-        echo "$CHANGED"
+    # --- Main: path filtering ------------------------------------------------
+    - name: Run paths-filter
+      id: filter
+      uses: dorny/paths-filter@v3
+      with:
+        base: ${{ steps.base.outputs.base }}
+        ref:  ${{ steps.base.outputs.after }}
+        filters: ${{ inputs.filters }}
 
-        TAGS=""
-        IFS=$'\n' read -r -d '' -a MAP < <(echo "${{ inputs.service_tag_map }}" | tr -d '\r' && printf '\0')
-        for line in "${MAP[@]}"; do
-          [ -z "$line" ] && continue
+    # --- Post-process & output ----------------------------------------------
+    - name: Build tag list and expose outputs
+      id: set
+      shell: bash
+      run: |
+        set -euo pipefail
 
-          path=$(echo "$line" | awk -F'->' '{print $1}' | xargs)
-          tag=$(echo "$line" | awk -F'->' '{print $2}' | xargs)
+        RAW='${{ steps.filter.outputs.changes }}'   # JSON array of filter names (our tags)
+        echo "changes: $RAW"
 
-          echo "🔍 Matching path: $path - tag: $tag - against changed files:"
-          while read -r changed; do
-            echo "   🔸 Changed: [$changed]"
-            echo "   🔸 Path:    [$path]"
-            if [[ "$changed" == "$path"* ]]; then
-              echo "   ✅ Match found! Adding tag: $tag"
-              TAGS="$TAGS,$tag"
-            else
-              echo "   ❌ No match!"
-            fi
-          done <<< "$CHANGED"
-        done
+        TAGS="$(printf '%s' "$RAW" | jq -r 'select(type=="array") | unique | join(",")')"
 
-        TAGS=$(echo "$TAGS" | sed 's/^,//')
-        echo "✅ Detected tags: $TAGS"
-        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+        # Guards & logs
+        if [ -z "${TAGS:-}" ]; then
+          echo "❌ No filters matched; no tags will be emitted."
+          MATCHED=false
+        else
+          echo "✅ Detected tags: $TAGS"
+          MATCHED=true
+        fi
+
+        echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+        echo "matched=$MATCHED" >> "$GITHUB_OUTPUT"

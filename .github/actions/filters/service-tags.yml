@@ -1,0 +1,4 @@
+account-service:
+  - 'src/main/java/account/**'
+payment-service:
+  - 'src/main/java/payment/**'

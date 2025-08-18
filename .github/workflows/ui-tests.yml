@@ -12,7 +12,8 @@ jobs:
   detect-tags:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.detect.outputs.tags }}
+      tags:    ${{ steps.detect.outputs.tags }}
+      matched: ${{ steps.detect.outputs.matched }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,12 +26,10 @@ jobs:
         with:
           before: ${{ github.event.workflow_run.head_commit.before }}
           after: ${{ github.event.workflow_run.head_commit.id }}
-          service_tag_map: |
-            src/main/java/account/->account-service
-            src/main/java/payment/->payment-service
+          filters: .github/filters/test-tags.yml
 
   trigger-ui-tests:
-    if: ${{ needs.detect-tags.outputs.tags != '' }}
+    if: ${{ needs.detect-tags.outputs.matched == 'true' }}
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
