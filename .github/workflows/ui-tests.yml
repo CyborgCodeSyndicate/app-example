@@ -26,7 +26,7 @@ jobs:
         with:
           before: ${{ github.event.workflow_run.head_commit.before }}
           after: ${{ github.event.workflow_run.head_commit.id }}
-          filters: .github/filters/test-tags.yml
+          filters: .github/filters/service-tags.yml
 
   trigger-ui-tests:
     if: ${{ needs.detect-tags.outputs.matched == 'true' }}
