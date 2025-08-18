@@ -30,7 +30,7 @@ jobs:
             src/main/java/payment/->payment-service
 
   trigger-ui-tests:
-    if: ${{ needs.detect-tag.outputs.tags != '' }}
+    if: ${{ needs.detect-tags.outputs.tags != '' }}
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
