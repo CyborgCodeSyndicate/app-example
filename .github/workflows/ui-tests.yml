@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   detect-tags:
+    if: ${{ github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     outputs:
       tags:    ${{ steps.detect.outputs.tags }}
@@ -17,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_commit.id }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 2
 
       - name: Set tags for detected changes
@@ -25,7 +26,7 @@ jobs:
         uses: ./.github/actions/detect-tags  # LOCAL ACTION REFERENCE
         with:
           before: ${{ github.event.workflow_run.head_commit.before }}
-          after: ${{ github.event.workflow_run.head_commit.id }}
+          after: ${{ github.event.workflow_run.head_sha }}
           filters: .github/filters/service-tags.yml
 
   trigger-ui-tests:
@@ -33,7 +34,7 @@ jobs:
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
-      tagsInclude: ${{ needs.detect-tags.outputs.tags }}
+      tagsInclude: "Smoke,${{ needs.detect-tags.outputs.tags }}"
       tagsExclude: "Flaky"
       maxTestsPerJob: "20"
       maxThreadsPerJob: "10"
