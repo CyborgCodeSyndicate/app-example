@@ -30,7 +30,7 @@ jobs:
           filters: .github/filters/service-tags.yml
 
   trigger-ui-tests:
-    if: ${{ needs.detect-tags.outputs.matched == 'true' }}
+    if: ${{ needs.detect-tags.outputs.matched == 'false' }}
     needs: detect-tags
     uses: CyborgCodeSyndicate/temp-project/.github/workflows/ui-tests.yml@test-app-job
     with:
